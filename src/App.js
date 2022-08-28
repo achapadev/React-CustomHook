@@ -10,28 +10,8 @@ function App() {
   // const [error, setError] = useState(null)
   const [tasks, setTasks] = useState([])
 
-  const transformTasks = (tasksObj) => {
-    const loadedTasks = []
-
-    // transform all tasks from objects which we get back from Firebase into objects that have structure we need for frontend
-    for (const taskKey in tasksObj) {
-      loadedTasks.push({ id: taskKey, text: tasksObj[taskKey].text })
-    }
-
-    setTasks(loadedTasks)
-  }
-
   // assign alias to sendRequest function from custom hook
-  const {
-    isLoading,
-    error,
-    sendRequest: fetchTasks,
-  } = useHttp(
-    {
-      url: 'https://react-http-c03a9-default-rtdb.firebaseio.com/tasks.json',
-    },
-    transformTasks
-  )
+  const { isLoading, error, sendRequest: fetchTasks } = useHttp()
 
   // const fetchTasks = async (taskText) => {
   // in this component and NewTasks we are managing a loading and error state and setting them similarly
@@ -66,8 +46,27 @@ function App() {
   // }
 
   useEffect(() => {
-    fetchTasks()
-  }, [])
+    const transformTasks = (tasksObj) => {
+      const loadedTasks = []
+
+      // transform all tasks from objects which we get back from Firebase into objects that have structure we need for frontend
+      for (const taskKey in tasksObj) {
+        loadedTasks.push({ id: taskKey, text: tasksObj[taskKey].text })
+      }
+
+      setTasks(loadedTasks)
+    }
+
+    fetchTasks(
+      {
+        url: 'https://react-http-c03a9-default-rtdb.firebaseio.com/tasks.json',
+      },
+      transformTasks
+    )
+  }, [fetchTasks])
+
+  // when you use a custom hook which uses state and you use hook in a component it will implicitly use that state
+  // so the state configured in custom hook is attached to this component and when that state changes this component will be rerendered
 
   const taskAddHandler = (task) => {
     setTasks((prevTasks) => prevTasks.concat(task))

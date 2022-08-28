@@ -1,14 +1,14 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 // to make hook able to send any kind of request to any kind of URl and do any kind of data transformation
 // need some parameters: the request logic, theURL, the method, the body, the headers (an object)
-const useHttp = (requestConfig, applyData) => {
+const useHttp = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   // get rid of task state because it is specific to app component ... we want this hook to be useable with any kind of data
   //   const [tasks, setTasks] = useState([])
 
-  const sendRequest = async (taskText) => {
+  const sendRequest = useCallback(async (requestConfig, applyData) => {
     // in this component and NewTasks we are managing a loading and error state and setting them similarly
     // because we have some code duplication and it contains other react hooks/state a reg function won't do trick we will use custom hook to outsource http logic
 
@@ -41,7 +41,7 @@ const useHttp = (requestConfig, applyData) => {
       setError(err.message || 'Something went wrong!')
     }
     setIsLoading(false)
-  }
+  }, [])
   //   return something to component where the custom hook is used
   return {
     isLoading: isLoading,
